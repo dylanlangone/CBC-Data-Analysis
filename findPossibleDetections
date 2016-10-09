@@ -1,0 +1,15 @@
+listMax1hz = [] #list of maximum SNR values per second
+SNRindx = 0
+print len(SNR)
+while SNRindx+4096 < len(SNR):
+    listMax1hz.append(np.amax(SNR[SNRindx:SNRindx+4096]))
+    SNRindx += 4096
+
+print 'list of max SNRs: ', listMax1hz
+
+listPossibleDetections = []
+for x in listMax1hz:
+    if x > 10:
+        listPossibleDetections.append(x)
+
+print 'possible detections', listPossibleDetections
