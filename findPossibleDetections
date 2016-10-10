@@ -12,4 +12,4 @@ for x in listMax1hz:
     if x > 10:
         listPossibleDetections.append(x)
 
-print 'possible detections', listPossibleDetections
+print 'possible detections: ', listPossibleDetections
