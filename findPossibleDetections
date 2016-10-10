@@ -14,11 +14,17 @@ for x in listMax1hz:
 
 print 'possible detections: ', listPossibleDetections
 
-#2d array of SNRs and associated times
-#SNRtime = np.array([SNR, time], np.float64)
+#find times for possible detections
+detectTimesElems = []
+for x in range(0, len(time)):
+    for y in listPossibleDetections:
+        if abs(SNR[x] - y) < .0001:
+            detectTimesElems.append(x)
 
-listMax1hz = np.array([[], []], np.float64)
-SNRindx = 0
-while SNRindx + 4096 < len(SNR):
-    listMax1hz = np.append(listMax1hz, [[np.max(SNRtime[:,0]),0]], 0)
+
+for x in range(0, len(detectTimesElems)):
+    detectTimesElems[x] = detectTimesElems[x]/(fs * 1.0)
+
+print 'possible times: ', detectTimesElems
+
 
