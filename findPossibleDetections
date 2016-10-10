@@ -13,3 +13,18 @@ for x in listMax1hz:
         listPossibleDetections.append(x)
 
 print 'possible detections: ', listPossibleDetections
+
+#find times for possible detections
+detectTimesElems = []
+for x in range(0, len(time)):
+    for y in listPossibleDetections:
+        if abs(SNR[x] - y) < .0001:
+            detectTimesElems.append(x)
+
+
+for x in range(0, len(detectTimesElems)):
+    detectTimesElems[x] = detectTimesElems[x]/(fs * 1.0)
+
+print 'possible times: ', detectTimesElems
+
+
