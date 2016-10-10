@@ -13,3 +13,12 @@ for x in listMax1hz:
         listPossibleDetections.append(x)
 
 print 'possible detections: ', listPossibleDetections
+
+#2d array of SNRs and associated times
+#SNRtime = np.array([SNR, time], np.float64)
+
+listMax1hz = np.array([[], []], np.float64)
+SNRindx = 0
+while SNRindx + 4096 < len(SNR):
+    listMax1hz = np.append(listMax1hz, [[np.max(SNRtime[:,0]),0]], 0)
+
