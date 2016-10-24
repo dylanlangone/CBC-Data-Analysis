@@ -14,6 +14,7 @@ import matplotlib.mlab as mlab
 # create output file
 gw_output = open('GWOutput5.txt', 'a')
 listPossibleDetections = []  # SNRs of possible detections
+detectTimesElems = []  # times for possible SNRs 
 # read the data file (16 seconds, sampled at 4096hz)
 fs = 4096
 # goes across multiple files to get good data based on given times
@@ -156,7 +157,7 @@ for i in range(0, int((stop - start) / interval)):
         gw_output.flush()
 
         # find times for possible detections
-        detectTimesElems = []
+
         for x in range(0, len(time)):
             for y in listPossibleDetections:
                 if abs(SNR[x] - y) < .0001:
