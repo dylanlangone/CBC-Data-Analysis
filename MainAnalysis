@@ -12,7 +12,7 @@ import matplotlib.mlab as mlab
 # CODE MUST BE MODIFIED TO ACCOMODATE MULTIPLE TEMPLATE RUNS
 
 # create output file
-gw_output = open('GWOutput3.txt', 'a')
+gw_output = open('GWOutput5.txt', 'a')
 listPossibleDetections = []  # SNRs of possible detections
 # read the data file (16 seconds, sampled at 4096hz)
 fs = 4096
@@ -37,9 +37,10 @@ for i in range(0, int((stop - start) / interval)):
         tempStart += int(len(strain) / 4096.)
 
         # read the template file (1 second, sampled at 4096hz)
-        templateFile = h5py.File('template.hdf5', 'r')
-        template = templateFile['strain/Strain'][...]
-        temp_time = np.arange(0, template.size / (1.0 * fs), 1. / fs)
+        templateFile = h5py.File("rhOverM_Asymptotic_GeometricUnits.h5", "r")
+        tempData = templateFile['Extrapolated_N2.dir/Y_l2_m-1.dat']
+        tempStrain = tempData[:, 1]
+        temp_time = np.arange(0, tempStrain.size / (1.0 * fs), 1. / fs)
         templateFile.close()
 
         # plt.figure()
@@ -47,14 +48,14 @@ for i in range(0, int((stop - start) / interval)):
         # plt.xlabel('Time (s)')
         # plt.ylabel('Strain')
 
-        plt.figure()
-        plt.plot(temp_time, template)
-        plt.xlabel('Time (s)')
-        plt.ylabel('Strain')
-        plt.title('Template')
+        #plt.figure()
+        #plt.plot(temp_time, template)
+        #plt.xlabel('Time (s)')
+        #plt.ylabel('Strain')
+        #plt.title('Template')
         # plt.show()
 
-        # plots the amplitude spectral density
+        # plots the amplitude spectral density of strain
         Pxx, freqs = mlab.psd(strain, Fs=fs, NFFT=2 * fs)
         plt.figure()
         plt.loglog(freqs, np.sqrt(Pxx))
@@ -63,18 +64,8 @@ for i in range(0, int((stop - start) / interval)):
         plt.xlabel('Freq (Hz)')
         plt.ylabel('Strain / Hz$^{1/2}$')
 
-        # plots ASD of last 4 seconds of strain data
-        plt.figure()
-        power_data, freq_psd = plt.psd(strain[12 * fs:], Fs=fs, NFFT=fs, visible=False)
-        plt.close()
-
-        plt.figure()
-        plt.loglog(freq_psd, np.sqrt(power_data), 'b')
-
-        plt.grid('on')
-        # plt.show()
         # plot ASD of the template
-        power_data2, freq_psd2 = plt.psd(template, Fs=fs, NFFT=fs, visible=False)
+        power_data2, freq_psd2 = plt.psd(tempStrain, Fs=fs, NFFT=fs, visible=False)
         plt.loglog(freq_psd2, np.sqrt(power_data2))
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('ASD')
@@ -94,8 +85,8 @@ for i in range(0, int((stop - start) / interval)):
 
         # time domain cross-correlation
         # tests similarity of time series at any time lag
-        correlated_raw = np.correlate(strain, template, 'valid')
-        correlated_passed = np.correlate(data_pass, template, 'valid')
+        correlated_raw = np.correlate(strain, tempStrain, 'valid')
+        correlated_passed = np.correlate(data_pass, tempStrain, 'valid')
         plt.figure()
         plt.plot(np.arange(0, (correlated_raw.size * 1.) / fs, 1.0 / fs), correlated_raw)
         plt.title('Time Domain Cross-correlation')
@@ -115,8 +106,8 @@ for i in range(0, int((stop - start) / interval)):
         data_fft = np.fft.fft(strain)
 
         # template and data must be the same length, so pad template with zeros
-        zero_pad = np.zeros(strain.size - template.size)
-        template_pad = np.append(template, zero_pad)
+        zero_pad = np.zeros(strain.size - tempStrain.size)
+        template_pad = np.append(tempStrain, zero_pad)
         template_fft = np.fft.fft(template_pad)
 
         # Calculate the PSD of the data
@@ -156,7 +147,6 @@ for i in range(0, int((stop - start) / interval)):
             SNRindx += 4096
 
         #gw_output.write('list of max SNRs: ' + str(listMax1hz) + '\n')
-        #gw_output.flush()
 
         for x in listMax1hz:
             if x > 8:
@@ -164,6 +154,7 @@ for i in range(0, int((stop - start) / interval)):
 
         gw_output.write('possible detections: ' + str(listPossibleDetections) + '\n')
         gw_output.flush()
+
         # find times for possible detections
         detectTimesElems = []
         for x in range(0, len(time)):
