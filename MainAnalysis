@@ -150,18 +150,20 @@ for i in range(0, int((stop - start) / interval)):
         SNRindx = 0
         print 'len(SNR): ', len(SNR)
         gw_output.write('len(SNR): ' + str(len(SNR)) + '\n')
+        gw_output.flush()
         while SNRindx + 4096 < len(SNR):
             listMax1hz.append(np.amax(SNR[SNRindx:SNRindx + 4096]))
             SNRindx += 4096
 
         #gw_output.write('list of max SNRs: ' + str(listMax1hz) + '\n')
+        #gw_output.flush()
 
         for x in listMax1hz:
             if x > 8:
                 listPossibleDetections.append(x)
 
         gw_output.write('possible detections: ' + str(listPossibleDetections) + '\n')
-
+        gw_output.flush()
         # find times for possible detections
         detectTimesElems = []
         for x in range(0, len(time)):
@@ -173,3 +175,4 @@ for i in range(0, int((stop - start) / interval)):
             detectTimesElems[x] = tempStart + (detectTimesElems[x] / (fs * 1.0))
 
         gw_output.write(str(strftime('%Y-%m-%d %H:%M:%S')) + '   possible times: ' + str(detectTimesElems) + '\n')
+        gw_output.flush()
