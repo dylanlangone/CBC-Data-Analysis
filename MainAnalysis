@@ -12,21 +12,24 @@ import matplotlib.mlab as mlab
 # CODE MUST BE MODIFIED TO ACCOMODATE MULTIPLE TEMPLATE RUNS
 
 # create output file
-gw_output = open('GWOutput5.txt', 'a')
+gw_output = open('GWOutput6.txt', 'a')
 listPossibleDetections = []  # SNRs of possible detections
-detectTimesElems = []  # times for possible SNRs 
+detectTimesElems = [] #times of possible detections
 # read the data file (16 seconds, sampled at 4096hz)
 fs = 4096
 # goes across multiple files to get good data based on given times
-start = 842656000
-stop = 842670000
-
-interval = 2048
+start = 931049472
+stop = 931094528
+gw_output.write('Real Time start: ' + str(strftime('%Y-%m-%d %H:%M:%S')) + '\n')
+gw_output.write('GPS start: ' + str(start) + ' stop: ' + str(stop) + '\n')
+gw_output.flush()
+interval = 2048  # to prevent computer from running out of memory
 newStart = start - interval
 for i in range(0, int((stop - start) / interval)):
     newStart += interval
     newStop = newStart + interval
 
+    #list of strain segments that statisfy CBC flag
     segList = r1.getsegs(newStart, newStop, 'H1', flag='CBCLOW_CAT1')
     tempStart = start
 
@@ -168,3 +171,5 @@ for i in range(0, int((stop - start) / interval)):
 
         gw_output.write(str(strftime('%Y-%m-%d %H:%M:%S')) + '   possible times: ' + str(detectTimesElems) + '\n')
         gw_output.flush()
+
+gw_output.write('--------------------------------------------------------------------------' + '\n')
