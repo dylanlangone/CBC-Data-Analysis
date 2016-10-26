@@ -10,6 +10,7 @@ import matplotlib.mlab as mlab
 # Assumes strain files are in the project directory
 # Only works for one template at a time
 # CODE MUST BE MODIFIED TO ACCOMODATE MULTIPLE TEMPLATE RUNS
+# CHANGE BETWEEN H1 AND L1 AS NECESSARY
 
 # create output file
 gw_output = open('GWOutput6.txt', 'a')
