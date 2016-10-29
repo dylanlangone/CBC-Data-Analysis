@@ -10,12 +10,11 @@ import matplotlib.mlab as mlab
 # Assumes strain files are in the project directory
 # Only works for one template at a time
 # CODE MUST BE MODIFIED TO ACCOMODATE MULTIPLE TEMPLATE RUNS
-# CHANGE BETWEEN H1 AND L1 AS NECESSARY
 
 # create output file
-gw_output = open('GWOutput6.txt', 'a')
-listPossibleDetections = []  # SNRs of possible detections
-
+gw_output = open('GWOutput7.txt', 'a')
+#listPossibleDetections = []  # SNRs of possible detections
+listPossibleTimes = []
 # read the data file (16 seconds, sampled at 4096hz)
 fs = 4096
 # goes across multiple files to get good data based on given times
@@ -32,14 +31,18 @@ for i in range(0, int((stop - start) / interval)):
 
     #list of strain segments that statisfy CBC flag
     segList = r1.getsegs(newStart, newStop, 'L1', flag='CBCLOW_CAT1')
-    tempStart = start
+
 
     for (begin, end) in segList:
         #uses the getstrain() method to load the data
         strain, meta, dq = r1.getstrain(begin, end, 'L1')
+        ts = 1/4096.
+        tempStart = meta['start']
+        tempStop = meta['stop']
 
-        time = np.arange(tempStart, tempStart + int(len(strain) / 4096.), 1. / fs)
-        tempStart += int(len(strain) / 4096.)
+        print tempStart
+        time = np.arange(tempStart, tempStop, ts)
+
 
         # read the template file (1 second, sampled at 4096hz)
         templateFile = h5py.File("rhOverM_Asymptotic_GeometricUnits.h5", "r")
@@ -47,7 +50,7 @@ for i in range(0, int((stop - start) / interval)):
         tempStrain = tempData[:, 1]
         temp_time = np.arange(0, tempStrain.size / (1.0 * fs), 1. / fs)
         templateFile.close()
-        
+
         # plt.figure()
         # plt.plot(time,strain)
         # plt.xlabel('Time (s)')
@@ -142,6 +145,7 @@ for i in range(0, int((stop - start) / interval)):
         # plt.ylabel('SNR')
         # Look for peak of matched filter output, which is SNR of signal
 
+        listPossibleDetections = []  # SNRs of possible detections
         listMax1hz = []  # list of maximum SNR values per second
         SNRindx = 0
         print 'len(SNR): ', len(SNR)
@@ -161,16 +165,18 @@ for i in range(0, int((stop - start) / interval)):
         gw_output.flush()
 
         # find times for possible detections
-        detectTimesElems = []  # times of possible detections
+        tempDetectTimesElems = []  # times of possible detections
         for x in range(0, len(time)):
             for y in listPossibleDetections:
                 if abs(SNR[x] - y) < .0001:
-                    detectTimesElems.append(x)
+                    tempDetectTimesElems.append(x)
 
-        for x in range(0, len(detectTimesElems)):
-            detectTimesElems[x] = tempStart + (detectTimesElems[x] / (fs * 1.0))
+        for x in range(0, len(tempDetectTimesElems)):
+            tempDetectTimesElems[x] = tempStart + (tempDetectTimesElems[x] * ts)
 
-        gw_output.write(str(strftime('%Y-%m-%d %H:%M:%S')) + '   possible times: ' + str(detectTimesElems) + '\n')
+        for x in tempDetectTimesElems:
+            listPossibleTimes.append(x)
+        gw_output.write(str(strftime('%Y-%m-%d %H:%M:%S')) + '   possible times: ' + str(listPossibleTimes) + '\n')
         gw_output.flush()
 
 gw_output.write('--------------------------------------------------------------------------' + '\n')
