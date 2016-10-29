@@ -5,11 +5,14 @@ import scipy.signal as sig
 import h5py
 import readligo as r1
 import matplotlib.mlab as mlab
-# Goes across specified GPS times to find
-# possible detections is SNR is above 8hz
-# Assumes strain files are in the project directory
-# Only works for one template at a time
-# CODE MUST BE MODIFIED TO ACCOMODATE MULTIPLE TEMPLATE RUNS
+"""
+Goes across specified GPS times to find
+possible detections is SNR is above 8hz
+Assumes strain files are in the project directory
+Only works for one template at a time
+CODE MUST BE MODIFIED TO ACCOMODATE MULTIPLE TEMPLATE RUNS
+
+"""
 
 # create output file
 gw_output = open('GWOutput7.txt', 'a')
