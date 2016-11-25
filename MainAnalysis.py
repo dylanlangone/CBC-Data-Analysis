@@ -16,7 +16,9 @@ gw_output = open('GWOutput12.txt', 'a')
 #listPossibleDetections = []  # SNRs of possible detections
 listPossibleTimes = []
 
-# read the data file (16 seconds, sampled at 4096hz)
+# read the data file 
+
+#frequency of strain data points in Hz
 fs = 4096
 # goes across multiple files to get good data based on given times
 """
@@ -24,9 +26,12 @@ First section lists the files
 """
 
 import json, urllib
+
+# SPECIFY THE DATASET (S5, S6, etc.)
+# SPECIFY THE START AND ENDPOINTS OF THE ANALYSIS IN GPS TIME
 dataset = 'S6'
-start = 931160064   # start of S6
-stop = 931186815  # end
+start = 931160064   # start (YOU CAN CHANGE THIS)
+stop = 931186815  # end (YOU CAN CHANGE THIS)   
 detector = 'L1'
 
 urlformat = 'https://losc.ligo.org/archive/links/{0}/{1}/{2}/{3}/json/'
@@ -48,14 +53,13 @@ for file in tiles['strain']:
 
 output_list.close()
 
-#--------------------------------------------------------------
 """
 Second section: processes those files
 """
 
 import os, urllib
 
-# First we get a list of all the files that are already processed
+# get a list of all the files that have already been processed
 try:
     f = open('filesdone')
     donelist = f.readlines()
@@ -67,12 +71,11 @@ print 'donelist: ', donelist
 
 interval = 2048  # to prevent computer from running out of memory
 
-# Now open the list of files that are to be processed
+# open the list of files that are to be processed
 for line in open('files').readlines():
     if line in donelist: continue    # already processed
 
-# Now build the URL for each file
-# Example line 815792128/H-H1_LOSC_4_V1-815886336-4096.hdf5
+# build the URL for each file
     tok = line.strip().split('/')
     url = line.strip()
     filename = tok[7]
@@ -118,25 +121,14 @@ for line in open('files').readlines():
             time = np.arange(tempStart, tempStop, ts)
 
 
-            # read the template file (1 second, sampled at 4096hz)
+            # read the template file 
             templateFile = h5py.File("rhOverM_Asymptotic_GeometricUnits.h5", "r")
             tempData = templateFile['Extrapolated_N2.dir/Y_l2_m-1.dat']
             templateStrain = tempData[:, 1]
             temp_time = np.arange(0, templateStrain.size / (1.0 * fs), 1. / fs)
             templateFile.close()
 
-            # plt.figure()
-            # plt.plot(time,strain)
-            # plt.xlabel('Time (s)')
-            # plt.ylabel('Strain')
-
-            #plt.figure()
-            #plt.plot(temp_time, template)
-            #plt.xlabel('Time (s)')
-            #plt.ylabel('Strain')
-            #plt.title('Template')
-            # plt.show()
-
+          
             # plots the amplitude spectral density of strain
             Pxx, freqs = mlab.psd(strain, Fs=fs, NFFT=2 * fs)
             #plt.figure()
@@ -257,6 +249,6 @@ for line in open('files').readlines():
     f = open('filesdone', 'a')  # mark the file as done
     print>> f, line.strip()
     f.close()
-    #os.remove(filename)  # delete the processed file
+    #os.remove(filename)  # delete the processed file to save storage space on your drive because the files are large and add up!
 
 gw_output.write('--------------------------------------------------------------------------' + '\n')
